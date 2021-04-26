@@ -45,14 +45,15 @@ async function startApp() {
 
               if (isAuthorised) {
                   await logUserIn(userId, request, reply)
-              }
-                reply.setCookie("testCookie", "this is a test", {
-                    path:"/",
-                    domain:"localhost",
-                    httpOnly: true
-                }).send({
-                    data: "just testing"
+                  reply.send({
+                    data: "User logged in"
                 })
+              }
+
+              reply.send({
+                  data: "auth failed"
+              })
+              
             } catch (error) {
                 console.error(error)
             }
