@@ -1,0 +1,25 @@
+{
+  "name": "node-auth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/index.js"
+  },
+  "author": "byron dunkley",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
+    "fastify": "^3.15.0",
+    "fastify-cookie": "^5.3.0",
+    "fastify-static": "^4.0.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.6.6"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
