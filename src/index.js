@@ -7,7 +7,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { connectDb } from './db.js';
 import { registerUser } from './accounts/register.js';
-import { authoriseUser } from './accounts/authorise.js'
+import { authoriseUser } from './accounts/authorise.js';
+import { logUserIn } from "./accounts/loguserin.js"
 
 
 // ESM specific feature
@@ -40,7 +41,11 @@ async function startApp() {
             try {
 
                 console.log(request.body)
-                await authoriseUser(request.body.email, request.body.password)
+              const { isAuthorised, userId } =   await authoriseUser(request.body.email, request.body.password);
+
+              if (isAuthorised) {
+                  await logUserIn(userId, request, reply)
+              }
                 reply.setCookie("testCookie", "this is a test", {
                     path:"/",
                     domain:"localhost",
