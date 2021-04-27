@@ -8,6 +8,7 @@ import { connectDb } from "./db.js";
 import { registerUser } from "./accounts/register.js";
 import { authoriseUser } from "./accounts/authorise.js";
 import { logUserIn } from "./accounts/loguserin.js";
+import { logUserOut } from "./accounts/loguserout.js"
 import { getUserFromCookies } from "./accounts/user.js";
 
 // ESM specific feature
@@ -59,7 +60,7 @@ async function startApp() {
     app.get("/test", {}, async (request, reply) => {
       try {
         // Verify user login
-        const user = await getUserFromCookies(request);
+        const user = await getUserFromCookies(request, reply);
         // Return user email if exists otherwise return unauthorised
         if (user) {
           reply.send({
@@ -74,6 +75,18 @@ async function startApp() {
         throw new Error(e);
       }
     });
+
+    app.post("/api/logout", {}, async (request, reply) => {
+        try {
+            await logUserOut(request, reply);
+            reply.send({
+                data: "User logged out",
+              });
+            
+        } catch (error) {
+            
+        }
+    })
 
     await app.listen(3000);
     console.log("Server Listening at port : 3000");

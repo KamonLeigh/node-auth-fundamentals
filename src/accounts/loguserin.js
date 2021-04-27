@@ -12,11 +12,13 @@ export async function logUserIn(userId, request, reply) {
     console.log("sessionToken", sessionToken);
     // Create JWT
     const { accessToken, refreshToken } = await createTokens(sessionToken, userId);
-    // Set Cookie
 
     const now = new Date();
-    const refreshExpires = now.setDate(now.getDate + 30);
 
+    // Get date 30 days into the future 
+    const refreshExpires = now.setDate(now.getDate() + 30);
+
+    // Set Cookie
     reply.setCookie("refreshToken", refreshToken, {
         path:"/",
         domain:"localhost",

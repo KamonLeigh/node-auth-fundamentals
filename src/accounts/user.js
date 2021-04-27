@@ -1,12 +1,14 @@
 import mongo from "mongodb";
 import jwt from 'jsonwebtoken';
+import { createTokens }  from './tokens.js'
 
 const { ObjectId } = mongo;
 
 const JWTSignature = process.env.JWT_SIGNATURE;
-export async function getUserFromCookies(request) {
+export async function getUserFromCookies(request, reply) {
     try {
         const { user } = await import("../user/user.js");
+        const { session } = await import("../session/session.js");
         // Check to make sure access token
         if (request?.cookies?.accessToken) {
             const { accessToken }  = request.cookies;
@@ -19,25 +21,50 @@ export async function getUserFromCookies(request) {
         }
 
 
-        // Get the access and refresh token
-        // if access token
-        
-        // Decode refresh token
-        // Look up session
-        // Confirm session is valid
-        // if session is valid refresch token
-        // Look up current user
-        // Return current user
+        if (request?.cookies?.refreshToken) {
+            const {  refreshToken } =  request.cookies;
+            const { sessionToken } = jwt.verify(refreshToken, JWTSignature);
+
+            const currentSession = await session.findOne({ sessionToken});
+            console.log(currentSession)
+
+            if (currentSession.valid) {
+                const currentUser = await user.findOne({
+                    _id : ObjectId(currentSession.userId)
+                })
+
+                // refresh token
+                await refreshTokens(sessionToken, currentUser._id, reply)
+                return currentUser;
+            }
+        }
+
+    
         
     } catch (error) {
-        console.error(e)
+        console.error(error)
     }
 }
 
-export async function refreshToken() {
+export async function refreshTokens(sessionToken, userId, reply) {
 
     try {
-        
+    const { accessToken, refreshToken}  = await createTokens(sessionToken, userId);
+    
+    const now = new Date();
+    const refreshExpires = now.setDate(now.getDate() + 30);
+
+    reply.setCookie("refreshToken", refreshToken, {
+        path:"/",
+        domain:"localhost",
+        httpOnly: true,
+        expires: refreshExpires
+    })
+    .setCookie("accessToken", accessToken, {
+        path:"/",
+        domain:"localhost",
+        httpOnly: true
+    })
     } catch (error) {
         console.error(error)
     }

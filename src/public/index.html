@@ -31,9 +31,25 @@
         <form id="login-form" action="">
             <input type="email" name="email">
             <input type="password" name="password">
-            <button type="submit">register</button>
+            <button type="submit">login</button>
         </form>
+        <hr>
+        <br>
+        <br>
+        <button onclick="logout()">Logout</button>
         <script>
+            async function logout() {
+                try {
+                    const res = await fetch('/api/logout', {
+                        method: "POST",
+                    })
+                    
+                } catch (error) {
+                    console.error(error)
+                }
+            }
+
+
             (()=> {
                 const registerForm = document.getElementById('register-form');
                 registerForm.addEventListener('submit', async (e) => {
