@@ -28,10 +28,27 @@ async function startApp() {
 
     app.post("/api/register", {}, async (request, reply) => {
       try {
-        await registerUser(request.body.email, request.body.password);
+       const userId = await registerUser(request.body.email, request.body.password);
+
+      if (userId) {
+          await logUserIn(userId, request, reply);
+
+          reply.send({
+              data: {
+                  status: "SUCCESS",
+                  userId
+              }
+          })
+      }
+
       } catch (error) {
         console.error(error);
-      }
+        reply.send({
+            data: {
+                status: "FAILED",
+            }
+        })
+    }
     });
 
     app.post("/api/authorise", {}, async (request, reply) => {
@@ -45,15 +62,24 @@ async function startApp() {
         if (isAuthorised) {
           await logUserIn(userId, request, reply);
           reply.send({
-            data: "User logged in",
-          });
+            data: {
+                status: "SUCCESS",
+            }
+        })
         }
 
         reply.send({
-          data: "auth failed",
-        });
+            data: {
+                status: "FAILED",
+            }
+        })
       } catch (error) {
         console.error(error);
+        reply.send({
+            data: {
+                status: "FAILED",
+            }
+        })
       }
     });
 
@@ -80,11 +106,17 @@ async function startApp() {
         try {
             await logUserOut(request, reply);
             reply.send({
-                data: "User logged out",
-              });
+                data: {
+                    status: "SUCCESS",
+                }
+            })
             
         } catch (error) {
-            
+            reply.send({
+                data: {
+                    status: "FAILED",
+                }
+            })
         }
     })
 
