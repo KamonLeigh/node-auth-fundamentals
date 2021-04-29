@@ -5,6 +5,7 @@ import { createTokens }  from './tokens.js'
 const { ObjectId } = mongo;
 
 const JWTSignature = process.env.JWT_SIGNATURE;
+const { ROOT_DOMAIN } = process.env;
 export async function getUserFromCookies(request, reply) {
     try {
         const { user } = await import("../user/user.js");
@@ -56,14 +57,16 @@ export async function refreshTokens(sessionToken, userId, reply) {
 
     reply.setCookie("refreshToken", refreshToken, {
         path:"/",
-        domain:"localhost",
+        domain:ROOT_DOMAIN,
         httpOnly: true,
-        expires: refreshExpires
+        expires: refreshExpires,
+        secure: true
     })
     .setCookie("accessToken", accessToken, {
         path:"/",
-        domain:"localhost",
-        httpOnly: true
+        domain:ROOT_DOMAIN,
+        httpOnly: true,
+        secure: true
     })
     } catch (error) {
         console.error(error)
