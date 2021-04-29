@@ -2,6 +2,7 @@ import "./env.js";
 import { fastify } from "fastify";
 import fastifyStatic from "fastify-static";
 import fastifyCookie from "fastify-cookie";
+import fastifyCors from "fastify-cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import { connectDb } from "./db.js";
@@ -19,6 +20,14 @@ const app = fastify();
 
 async function startApp() {
   try {
+    app.register(fastifyCors, {
+      origin: [
+        /\.nodeauth.dev/,
+        'https://nodeauth.dev'
+      ],
+      credentials: true
+    })
+
     app.register(fastifyCookie, {
       secret: process.env.COOKIE_SIGNATURE,
     });

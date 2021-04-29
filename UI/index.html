@@ -61,10 +61,10 @@
                        }
                        return obj
                     }, {})
-                   const res = await fetch('/api/register', {
+                   const res = await fetch('https://api.nodeauth.dev/api/register', {
                         method: "POST",
+                        credentials: "include",
                         body: JSON.stringify(values),
-                        credentials: 'include',
                         headers: {"Content-type": "application/json; charset=UTF-8"}
                     })
 
@@ -84,8 +84,9 @@
                        }
                        return obj
                     }, {})
-                   const res = await fetch('/api/authorise', {
+                   const res = await fetch('https://api.nodeauth.dev/api/authorise', {
                         method: "POST",
+                        credentials: "include",
                         body: JSON.stringify(values),
                         headers: {"Content-type": "application/json; charset=UTF-8"}
                     })
