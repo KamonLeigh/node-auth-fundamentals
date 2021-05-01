@@ -1,2 +1,5 @@
 node_modules/
+api/node_modules/
+UI/node_modules/
+api/.env
 .env
