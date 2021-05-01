@@ -36,16 +36,16 @@ async function startApp() {
                         headers: {"Content-type": "application/json; charset=UTF-8"}
                     })
 
+            if (res.status == 200) {
+                return reply.redirect("/")
+            }
+
             console.log(res);
-            reply.code(200).send("All is good!")
+            reply.code(401).send()
                 
             } catch (error) {
                 console.error(error);
-                reply.send({
-                    data: {
-                        status: "FAILED"
-                    }
-                })
+                reply.code(401).send()
             }
         })
         

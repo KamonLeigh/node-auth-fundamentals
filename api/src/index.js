@@ -12,7 +12,8 @@ import { logUserIn } from "./accounts/loguserin.js";
 import { logUserOut } from "./accounts/loguserout.js"
 import { getUserFromCookies } from "./accounts/user.js";
 import { sendEmail, mailInit } from "./mail/index.js";
-import { createVerifyEmailLink} from './accounts/verify.js'
+import { createVerifyEmailLink, validateVerifyEmail} from './accounts/verify.js'
+import { realpathSync } from "fs";
 
 
 // ESM specific feature
@@ -143,6 +144,23 @@ async function startApp() {
             })
         }
     })
+
+    app.post("/api/verify", {}, async (request, reply) => {
+      try {
+        const { token, email } = request.body;
+
+        const isValid = await validateVerifyEmail(token, email);
+        console.log({ email, token });
+
+        if (isValid) {
+          return reply.code(200).send();
+        }
+        
+         return reply.code(401).send();
+      } catch (error) {
+          return reply.code(401).send();
+      }
+  })
 
     await app.listen(3000);
     console.log("Server Listening at port : 3000");

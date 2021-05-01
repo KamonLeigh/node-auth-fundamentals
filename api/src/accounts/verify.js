@@ -26,3 +26,31 @@ export async function createVerifyEmailLink(email) {
         
     }
 }
+
+export async function validateVerifyEmail(token, email) {
+    try {
+       // Create a hash aka token
+       const emailToken = await createVerifyEmailToken(email)
+       
+       // Compare hash with token
+       const isValid = token === emailToken
+
+       if (isValid) {
+       // If suceesful, update user to make them verfied 
+       const { user } = await import("../user/user.js");
+       await user.updateOne({
+        "email.address": email
+       },{
+         $set: { "email.verified": true }
+       })
+        
+       return true;
+
+       }
+
+       return false;
+    } catch (error) {
+       console.error(error);
+       return false;
+    }
+}
