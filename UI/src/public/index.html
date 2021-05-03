@@ -52,7 +52,27 @@
             <input type="password" name="password">
             <button type="submit">login</button>
         </form>
+        <h3>Forgot Password</h3>
+        <form id="forgot-password" action="">
+            <label for="email">
+                Email
+                <input type="email" name="email">
+            </label> 
+            <button type="submit">Send Forgot Email</button>
+        </form>
+        <hr>
+        <br>
+        <br>
         <script>
+            function getValues(form) {
+                return  Object.values(form).reduce((obj, field) => {
+                       if(field.name){
+                           obj[field.name] = field.value;
+                       }
+                       return obj
+                    }, {})
+            }
+
             async function logout() {
                 try {
                     const res = await fetch('https://api.nodeauth.dev/api/logout', {
@@ -71,12 +91,7 @@
                 registerForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     try {
-                    const values = Object.values(registerForm).reduce((obj, field) => {
-                       if(field.name){
-                           obj[field.name] = field.value;
-                       }
-                       return obj
-                    }, {})
+                   const values = getValues(registerForm);
                    const res = await fetch('https://api.nodeauth.dev/api/register', {
                         method: "POST",
                         credentials: "include",
@@ -94,12 +109,8 @@
                 loginForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     try {
-                    const values = Object.values(loginForm).reduce((obj, field) => {
-                       if(field.name){
-                           obj[field.name] = field.value;
-                       }
-                       return obj
-                    }, {})
+                   const values = getValues(loginForm);
+
                    const res = await fetch('https://api.nodeauth.dev/api/authorise', {
                         method: "POST",
                         credentials: "include",
@@ -117,14 +128,28 @@
                 changeForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     try {
-                    const values = Object.values(changeForm).reduce((obj, field) => {
-                       if(field.name){
-                           obj[field.name] = field.value;
-                       }
-                       return obj  
-            
-                    }, {})
+                    const values = getValues(changeForm);
+
                    const res = await fetch('https://api.nodeauth.dev/api/change-password', {
+                        method: "POST",
+                        credentials: "include",
+                        body: JSON.stringify(values),
+                        headers: {"Content-type": "application/json; charset=UTF-8"}
+                    })
+
+                   } catch(e) {
+                       console.log(e)
+                   }
+
+                });
+
+                const forgotForm = document.getElementById('forgot-password');
+                forgotForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                    const values = getValues(forgotForm);
+
+                   const res = await fetch('https://api.nodeauth.dev/api/forgot-password', {
                         method: "POST",
                         credentials: "include",
                         body: JSON.stringify(values),
