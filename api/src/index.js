@@ -14,7 +14,7 @@ import { getUserFromCookies, changePassword } from "./accounts/user.js";
 import { sendEmail, mailInit } from "./mail/index.js";
 import { createVerifyEmailLink, validateVerifyEmail} from './accounts/verify.js'
 import { realpathSync } from "fs";
-
+import {  createResetLink } from "./accounts/reset.js"
 
 // ESM specific feature
 const __filename = fileURLToPath(import.meta.url);
@@ -161,6 +161,29 @@ async function startApp() {
           return reply.code(401).send();
       }
   })
+
+  app.post("/api/forgot-password", {}, async (request, reply) => {
+    try {
+      const { email } = request.body;
+      const link = await createResetLink(email);
+
+      if (link) {
+        await sendEmail({
+          to: email,
+          subject: "Reset password",
+          html: `<a href="${link}">reset</a>`
+        })
+      }
+      // check to see if a user exists with that email
+      // If user exists
+      // Create email link
+      // Link email contains user email, token, exppiration date
+      // send email ???
+       return reply.code(200).send();
+    } catch (error) {
+        return reply.code(401).send();
+    }
+})
 
   app.post("/api/change-password", {}, async(request, reply) => {
 
