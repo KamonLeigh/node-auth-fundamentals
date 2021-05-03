@@ -27,16 +27,31 @@
          <hr>
          <br>
          <br>
+        <h3>Change Password</h3>
+        <form id="change-form" action="">
+            <label for="oldPassword">
+                Old Password 
+                <input type="password" name="oldPassword">
+            </label> 
+            <label for="newPassword">
+                New Password
+                <input type="password" name="newPassword">
+            </label>
+            <button type="submit">Change Password</button>
+        </form>
+        <hr>
+        <br>
+        <br>
+        <button onclick="logout()">Logout</button>
+        <hr>
+        <br>
+        <br>
         <h3>login Form</h3>
         <form id="login-form" action="">
             <input type="email" name="email">
             <input type="password" name="password">
             <button type="submit">login</button>
         </form>
-        <hr>
-        <br>
-        <br>
-        <button onclick="logout()">Logout</button>
         <script>
             async function logout() {
                 try {
@@ -85,6 +100,30 @@
                        return obj
                     }, {})
                    const res = await fetch('https://api.nodeauth.dev/api/authorise', {
+                        method: "POST",
+                        credentials: "include",
+                        body: JSON.stringify(values),
+                        headers: {"Content-type": "application/json; charset=UTF-8"}
+                    })
+
+                   } catch(e) {
+                       console.log(e)
+                   }
+
+                });
+
+                const changeForm = document.getElementById('change-form');
+                changeForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                    const values = Object.values(changeForm).reduce((obj, field) => {
+                       if(field.name){
+                           obj[field.name] = field.value;
+                       }
+                       return obj  
+            
+                    }, {})
+                   const res = await fetch('https://api.nodeauth.dev/api/change-password', {
                         method: "POST",
                         credentials: "include",
                         body: JSON.stringify(values),

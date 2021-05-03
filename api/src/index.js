@@ -10,7 +10,7 @@ import { registerUser } from "./accounts/register.js";
 import { authoriseUser } from "./accounts/authorise.js";
 import { logUserIn } from "./accounts/loguserin.js";
 import { logUserOut } from "./accounts/loguserout.js"
-import { getUserFromCookies } from "./accounts/user.js";
+import { getUserFromCookies, changePassword } from "./accounts/user.js";
 import { sendEmail, mailInit } from "./mail/index.js";
 import { createVerifyEmailLink, validateVerifyEmail} from './accounts/verify.js'
 import { realpathSync } from "fs";
@@ -160,6 +160,39 @@ async function startApp() {
       } catch (error) {
           return reply.code(401).send();
       }
+  })
+
+  app.post("/api/change-password", {}, async(request, reply) => {
+
+    try {
+
+    // Verify user login
+    const user = await getUserFromCookies(request, reply);
+    // Compare current logged in user with form re-auth 
+    console.log(user);
+   const {oldPassword, newPassword } =  request.body;
+    if (user?.email?.address) {
+      const { isAuthorised, userId} = await authoriseUser(
+        user.email.address,
+        oldPassword
+       )
+       console.log(isAuthorised, "isA")
+       // If user is who they say they are
+       if (isAuthorised) {
+
+        await changePassword(userId, newPassword);
+
+        // Update password in db
+        return reply.code(200).send("All Good")
+       }
+
+
+       
+    }
+      return reply.code(401).send();
+    } catch (error) {
+      return reply.code(401).send();
+    }
   })
 
     await app.listen(3000);
