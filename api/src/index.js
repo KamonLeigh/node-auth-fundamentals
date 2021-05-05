@@ -14,7 +14,7 @@ import { getUserFromCookies, changePassword } from "./accounts/user.js";
 import { sendEmail, mailInit } from "./mail/index.js";
 import { createVerifyEmailLink, validateVerifyEmail} from './accounts/verify.js'
 import { realpathSync } from "fs";
-import {  createResetLink } from "./accounts/reset.js"
+import {  createResetLink, validateResetEmail } from "./accounts/reset.js"
 
 // ESM specific feature
 const __filename = fileURLToPath(import.meta.url);
@@ -216,6 +216,32 @@ async function startApp() {
     } catch (error) {
       return reply.code(401).send();
     }
+  })
+
+  app.post("/api/reset", {}, async (request, reply) => {
+
+    try {
+      const { email, password, token, time } = request.body;
+      const isValid = await validateResetEmail(token, email, time);
+      
+      if (isValid) {
+        // Find User
+        const { user } = await import("./user/user.js");
+        const currentUser = await user.findOne({
+          "email.address": email
+        });
+
+        // Change password 
+        await changePassword(currentUser._id, password)
+        return reply.code(200).send('Updated Password');
+      }
+
+      return reply.code(401).send('failed to up update');
+    } catch (error) {
+      
+    }
+   
+
   })
 
     await app.listen(3000);
