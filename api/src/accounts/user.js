@@ -104,7 +104,7 @@ export async function register2FA(userId, secret) {
             _id: userId
         },{
             $set: {
-                autheticator: secret
+                authenticator: secret
             }
         })
         

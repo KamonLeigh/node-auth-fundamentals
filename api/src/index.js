@@ -101,18 +101,24 @@ async function startApp() {
     app.post("/api/authorise", {}, async (request, reply) => {
       try {
         console.log(request.body);
-        const { isAuthorised, userId } = await authoriseUser(
+        const { isAuthorised, userId, authenticatorSecret } = await authoriseUser(
           request.body.email,
           request.body.password
         );
 
-        if (isAuthorised) {
+        if (isAuthorised && !authenticatorSecret) {
           await logUserIn(userId, request, reply);
           reply.send({
             data: {
                 status: "SUCCESS",
             }
         })
+        } else if (isAuthorised && authenticatorSecret) {
+          reply.send({
+            data: {
+              status: "2FA"
+            }
+          })
         }
 
         reply.send({
@@ -265,6 +271,25 @@ async function startApp() {
    
 
   })
+
+  app.post("/api/verify-2fa", {}, async (request, reply) => {
+    // verify user login
+
+    const { token, email, password } = request.body;
+  const { isAuthorised, userId, authenticatorSecret} =  await authoriseUser(email, password);
+  
+  const isValid = authenticator.verify({
+    token,
+    secret: authenticatorSecret
+  })
+
+  if (userId && isValid && isAuthorised) {
+    await logUserIn(userId, request, reply);
+    reply.send("sucesss")
+  }
+  
+  reply.code(401).send90
+})
 
     await app.listen(3000);
     console.log("Server Listening at port : 3000");

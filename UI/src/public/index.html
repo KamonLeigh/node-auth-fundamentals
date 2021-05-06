@@ -63,6 +63,15 @@
         <hr>
         <br>
         <br>
+        <h3>2FA</h3>
+        <div id="qr"></div>
+        <form action="" id="auth-token">
+            <label for="token">
+                <input name="token"type="text">
+            </label>
+            <button type="submit">Submit</button>
+        </form>
+        
         <script>
             function getValues(form) {
                 return  Object.values(form).reduce((obj, field) => {
@@ -117,6 +126,34 @@
                         body: JSON.stringify(values),
                         headers: {"Content-type": "application/json; charset=UTF-8"}
                     })
+
+                    const loginData = await res.json();
+
+                    if (loginData.data.status === '2FA') {
+                        console.log('2FA')
+                        const authTokenForm = document.getElementById("auth-token");
+                        console.log(authTokenForm)
+                        authTokenForm.addEventListener("submit", async (e) => {
+                            e.preventDefault();
+                            try {
+                                const tokenValues = getValues(authTokenForm);
+                                console.log(tokenValues)
+                                const res = await fetch(
+                                    "https://api.nodeauth.dev/api/verify-2fa",
+                                    {
+                                        method: "POST",
+                                        credentials: "include",
+                                        body: JSON.stringify({...values, ...tokenValues}),
+                                        headers: {"Content-type": "application/json; charset=UTF-8"}
+                                    }
+                                )
+                               
+                                
+                            } catch (error) {
+                                
+                            }
+                        })
+                    }
 
                    } catch(e) {
                        console.log(e)
