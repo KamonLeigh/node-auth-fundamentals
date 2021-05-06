@@ -4,6 +4,7 @@ import fastifyStatic from "fastify-static";
 import fastifyCookie from "fastify-cookie";
 import fastifyCors from "fastify-cors";
 import path from "path";
+import { authenticator } from "@otplib/preset-default"
 import { fileURLToPath } from "url";
 import { connectDb } from "./db.js";
 import { registerUser } from "./accounts/register.js";
@@ -40,6 +41,22 @@ async function startApp() {
     app.register(fastifyStatic, {
       root: path.join(__dirname, "public"),
     });
+
+    app.get('/api/user', {}, async (request, reply) => {
+      const user = await getUserFromCookies(request, reply);
+      if (user) return reply.send({ data: user});
+      reply.send({});
+    });
+
+    app.post("/api/2fa-register", {}, async(request, reply) =>{
+      // verfy user login
+      const user = await getUserFromCookies(request, reply);
+      const { token, secret } = request.body;
+      const isValid = authenticator.verify({ token, secret});
+      console.log(isValid)
+      reply.send("success")
+
+    })
 
     app.post("/api/register", {}, async (request, reply) => {
       try {
