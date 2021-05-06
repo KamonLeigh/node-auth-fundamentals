@@ -95,3 +95,20 @@ export async function changePassword(userId, newPassword) {
         console.error(error)
     }
 }
+
+export async function register2FA(userId, secret) {
+    try {
+        const { user } = await import("../user/user.js");
+
+        return user.updateOne({
+            _id: userId
+        },{
+            $set: {
+                autheticator: secret
+            }
+        })
+        
+    } catch (error) {
+        console.error(error);
+    }
+}
